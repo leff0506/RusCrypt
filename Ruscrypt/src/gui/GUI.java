@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import server_interaction.Client;
 import user.User;
 
 public class GUI {
@@ -24,6 +25,7 @@ public class GUI {
 	private JTextField password_tf;
 	public GUI(User user){
 		createFrame();
+		Client client = new Client(user);
 		if(!user.isAuthorized()){
 			authorization(user);
 		}
@@ -101,7 +103,7 @@ public class GUI {
 			
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				cleanGL_panel();
+				
 				
 			}
 		});
