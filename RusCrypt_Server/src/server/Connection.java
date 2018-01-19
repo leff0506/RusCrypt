@@ -3,7 +3,12 @@
 package server;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -36,20 +41,59 @@ public class Connection implements Runnable{
 				txt = in.readLine();
 				if(!txt.equals("")){
 					if(!txt.equals("exit")){
-						
+						serverCommand(txt);
 						Server.log(txt);
 					}else{
 						connect = false;
-						System.out.println("Client exited");
+						Server.log("Client exited");
 				}
 			}
 				
 				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				Server.log("error");
 				e.printStackTrace();
+				break;
 			}
 			
 		}
+		
+	}
+	public void serverCommand(String txt){
+		if(txt.startsWith("authorization:")){
+			txt=txt.replace("authorization:","");
+			authorization(txt);
+		}
+	}
+	private void send(String txt){
+		out.println(txt);
+		out.flush();
+	}
+	private void authorization(String txt){
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("data_base/autho.txt")));
+			String inStr;
+			boolean autho=false;
+			while((inStr = reader.readLine())!=null){
+				if(inStr.equals(txt)){
+					
+					send("logged");
+					autho=true;
+					break;
+				}
+				
+			}
+			if(!autho){
+				send("unlogged");
+			}
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
+

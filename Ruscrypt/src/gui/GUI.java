@@ -23,9 +23,14 @@ public class GUI {
 	private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	private JTextField login_tf;
 	private JTextField password_tf;
+	
+	private JTextField name_tf;
+	private JTextField surname_tf;
+	
+	private Client client;
 	public GUI(User user){
 		createFrame();
-		Client client = new Client(user);
+		client = new Client(user);
 		if(!user.isAuthorized()){
 			authorization(user);
 		}
@@ -56,6 +61,7 @@ public class GUI {
 		c.repaint();
 	}
 	private void authorization(User user){
+		cleanGL_panel();
 		JPanel autho = new JPanel();
 		autho.setLayout(null);
 		autho.setSize(250,300);
@@ -103,10 +109,51 @@ public class GUI {
 			
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				user.setLogin(login_tf.getText());
+				user.setPassword(password_tf.getText());
 				
+				client.send("authorization:"+user.getLogin()+"/"+user.getPassword());
 				
 			}
 		});
+
+		JLabel sign_up = new JLabel("sign up");
+		sign_up.setForeground(Color.red);
+		sign_up.setSize(50,30);
+		sign_up.setLocation(0,150);
+		sign_up.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				signUp(user);
+				
+			}
+		});
+		add(autho,sign_up);
 		add(autho,submit);
 	}
 	private void cleanGL_panel(){
@@ -121,5 +168,113 @@ public class GUI {
 		gl_panel.add(c);
 		data.add(c);
 		frame.repaint();
+	}
+	private void signUp(User user){
+		cleanGL_panel();
+		JPanel sign_up_p = new JPanel();
+		sign_up_p.setLayout(null);
+		sign_up_p.setSize(250,300);
+		sign_up_p.setLocation(gl_panel.getWidth()/2-sign_up_p.getWidth()/2, gl_panel.getHeight()/2-sign_up_p.getWidth()/2);
+		sign_up_p.setBackground(Color.BLACK);
+		addToGl_panel(sign_up_p);
+		login_tf = new JTextField();
+		password_tf = new JTextField();
+		login_tf.setSize(100,20);
+		password_tf.setSize(100,20);
+		
+		password_tf.setLocation(0,50);
+		name_tf = new JTextField();
+		name_tf.setSize(100,20);
+		name_tf.setLocation(0,80);
+		
+		surname_tf = new JTextField();
+		surname_tf.setSize(100,20);
+		surname_tf.setLocation(0,110);
+		add(sign_up_p,name_tf);
+		add(sign_up_p,surname_tf);
+		add(sign_up_p,login_tf);
+		add(sign_up_p,password_tf);
+		
+		JLabel submit = new JLabel("Submit");
+		submit.setForeground(Color.red);
+		submit.setSize(50,30);
+		submit.setLocation(0,130);
+		submit.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				registration(user);
+			}
+		});
+
+		JLabel sign_in = new JLabel("sign in");
+		sign_in.setForeground(Color.red);
+		sign_in.setSize(50,30);
+		sign_in.setLocation(0,170);
+		sign_in.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				authorization(user);
+			}
+		});
+		add(sign_up_p,sign_in);
+		add(sign_up_p,submit);
+	}
+	private void registration(User user){
+		user.setLogin(login_tf.getText());
+		user.setPassword(password_tf.getText());
+		user.setName(name_tf.getText());
+		user.setSurname((surname_tf.getText()));
+		client.send("registration:"+user.getLogin()+"/"+user.getPassword()+"/"+user.getName()+"/"+user.getSurname());
 	}
 }

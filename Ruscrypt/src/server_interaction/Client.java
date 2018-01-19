@@ -25,59 +25,77 @@ public class Client {
 	}
 	private void  connect(){
 		 socket = null;
-		try {
-			 socket = new Socket(IP,PORT);
-			 connection = true;
-			
+		 for(;;){
+				 
 			 
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new PrintWriter(socket.getOutputStream());
-			
-			
-			
-			
-			 thread = new Thread(()->{
-				String txt=null;
-				while(connection){
-					try {
-						 txt = in.readLine();
-						if(txt!=null){
-							
-							System.out.println("Get From Server :"+txt);
-							command(txt);
-						}
-						
-					} catch (java.net.SocketException e) {
-						// TODO Auto-generated catch block
-						connection = false;
-						
-						e.printStackTrace();
-					}
-					catch (IOException e) {
-						// TODO Auto-generated catch block
-						
-						e.printStackTrace();
-					}
-				}
-			});
-			thread.start();
-			
 			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e1) {
+				
+				 socket = new Socket(IP,PORT);
+				 
+				
+				 connection = true;
+				
+				 
+				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				out = new PrintWriter(socket.getOutputStream());
+				
+				
+				
+				
+				 thread = new Thread(()->{
+					String txt=null;
+					while(connection){
+						try {
+							 txt = in.readLine();
+							if(txt!=null){
+								
+								System.out.println("Get From Server :"+txt);
+								command(txt);
+							}
+							
+						} catch (java.net.SocketException e) {
+							// TODO Auto-generated catch block
+							connection = false;
+							
+							e.printStackTrace();
+						}
+						catch (IOException e) {
+							// TODO Auto-generated catch block
+							
+							e.printStackTrace();
+						}
+					}
+				});
+				thread.start();
+				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				break;
+				
+			} catch (IOException e) {
+				
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				e.printStackTrace();
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				continue;
 			}
-			
-			
-		} catch (IOException e) {
-			out.println("exit");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		 }
 	}
 	private void command(String txt){
-		
+		if(txt.equals("logged")){
+			System.out.println("logged");
+		}else if(txt.equals("unlogged")){
+			System.out.println("fuck");
+		}
 	}
 	public void send(String txt){
 		if(!txt.equalsIgnoreCase("exit")){

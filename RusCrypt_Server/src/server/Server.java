@@ -20,11 +20,13 @@ public class Server {
 		log("server is running on port "+serverSocket.getLocalPort());
 		Socket user = null;
 		BufferedReader reader = null;
-		
+		while(true){
 			user = serverSocket.accept();
 			log("accept : "+user.getInetAddress().getHostAddress());
 			Thread th = new Thread(new Connection(user));
 			th.start();
+		}
+			
 		
 		}catch(Exception e){
 			e.printStackTrace();
