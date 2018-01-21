@@ -95,6 +95,8 @@ public class Client {
 			System.out.println("logged");
 		}else if(txt.equals("unlogged")){
 			System.out.println("fuck");
+		}else{
+			System.out.println(txt);
 		}
 	}
 	public void send(String txt){

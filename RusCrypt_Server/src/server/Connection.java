@@ -6,10 +6,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
@@ -63,6 +66,9 @@ public class Connection implements Runnable{
 		if(txt.startsWith("authorization:")){
 			txt=txt.replace("authorization:","");
 			authorization(txt);
+		}else if(txt.startsWith("registration:")){
+			txt=txt.replace("registration:","");
+			registration(txt);
 		}
 	}
 	private void send(String txt){
@@ -74,8 +80,26 @@ public class Connection implements Runnable{
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("data_base/autho.txt")));
 			String inStr;
 			boolean autho=false;
+			String inStrCut="";
+			int temp =0;
 			while((inStr = reader.readLine())!=null){
-				if(inStr.equals(txt)){
+				inStrCut="";
+				temp=0;
+				for(int i = 0 ; i < inStr.length();i++){
+					if(inStr.charAt(i)!='/'){
+						inStrCut+=inStr.charAt(i);
+					}else{
+						if(temp ==1){
+							break;
+						}else{
+							temp++;
+							inStrCut+='/';
+						}
+						
+					}
+				}
+				
+				if(inStrCut.equals(txt)){
 					
 					send("logged");
 					autho=true;
@@ -90,6 +114,46 @@ public class Connection implements Runnable{
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	private void registration(String txt){
+		try {
+			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("data_base/autho.txt")));
+			String inStr;
+			String login ="";
+			for(int i = 0 ; i < txt.length();i++){
+				if(txt.charAt(i)!='/'){
+					login+=txt.charAt(i);
+				}else{
+					break;
+				}
+			}
+			Server.log("login "+login);
+			boolean sign_up_error=false;
+			while((inStr = reader.readLine())!=null){
+				if(inStr.startsWith(login)){
+					
+					send("sign_up_error");
+					sign_up_error=true;
+					break;
+				}
+				
+			}
+			if(!sign_up_error){
+				PrintStream printStream = new PrintStream(new FileOutputStream("data_base/autho.txt", true), true);
+				printStream.println(txt);
+				printStream.close();
+			}
+			
+			
+			
+		
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
