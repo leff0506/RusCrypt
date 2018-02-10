@@ -7,6 +7,9 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,21 +22,30 @@ import server_interaction.Client;
 import user.User;
 
 public class GUI {
+	
 	private JFrame frame;
 	private ImagePanel gl_panel;
 	private ArrayList<Component> data= new ArrayList<>();
+	private ArrayList<Component> dataF= new ArrayList<>();
+	private ArrayList<String> param =new ArrayList<>();
+	private boolean upF=false;
+	private boolean selOn = false;
+	
 	private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	private final Color COMMON = Color.WHITE;
 	private MyTF login_tf;
 	private MyPF password_tf;
-	
+	private JPanel friends_p;
+	private JLabel selectOne;
 	private MyTF name_tf;
 	private MyTF surname_tf;
+	private int temp;
+	
 	
 	private Client client;
 	public GUI(User user){
 		createFrame();
-		client = new Client(user);
+		client = new Client(user,this);
 		if(!user.isAuthorized()){
 			authorization(user);
 		}
@@ -41,6 +53,32 @@ public class GUI {
 	}
 	private void createFrame(){
 		frame = new JFrame("RusCrypt");
+		frame.addWindowFocusListener(new WindowFocusListener() {
+			
+			@Override
+			public void windowLostFocus(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowGainedFocus(WindowEvent e) {
+				// TODO Auto-generated method stub
+				if(upF){
+					clearF_panel();
+					updateFriends();
+				}
+				if(selOn){
+					
+					selectOne.setLocation(300,300);
+					frame.repaint();
+				}
+				
+			}
+		});
+			
+			
+		
 		gl_panel = new ImagePanel();
 		
 		gl_panel.setBackground(Color.black);
@@ -64,6 +102,8 @@ public class GUI {
 		data.add(c);
 		frame.repaint();
 	}
+	
+	
 	private void authorization(User user){
 		cleanGL_panel();
 		
@@ -229,9 +269,22 @@ public class GUI {
 		data.clear();
 		frame.repaint();
 	}
+	private void clearF_panel(){
+		for(Component c : dataF){
+			friends_p.remove(c);
+			
+		}
+		dataF.clear();
+		frame.repaint();
+	}
 	private void addToGl_panel(Component c){
 		gl_panel.add(c);
 		data.add(c);
+		frame.repaint();
+	}
+	private void addToF_panel(Component c){
+		friends_p.add(c);
+		dataF.add(c);
 		frame.repaint();
 	}
 	private void signUp(User user){
@@ -428,5 +481,162 @@ public class GUI {
 		name_tf.setText("");
 		surname_tf.setText("");
 		client.send("registration:"+user.getLogin()+"/"+user.getPassword()+"/"+user.getName()+"/"+user.getSurname());
+	}
+	public void logged(){
+		cleanGL_panel();
+		
+		friends_p = new JPanel();
+		friends_p.setLocation(0,0);
+		friends_p.setSize(300,gl_panel.getHeight());
+		friends_p.setBackground(new Color(40,46,51));
+		
+		JPanel delimiter = new JPanel();
+		delimiter.setLocation(friends_p.getX()+friends_p.getWidth(),0);
+		delimiter.setSize(5,gl_panel.getHeight());
+		delimiter.setBackground(new Color(29,33,38));
+		
+		JPanel messField = new JPanel();
+		messField.setLocation(delimiter.getX()+delimiter.getWidth(),0);
+		messField.setSize(gl_panel.getWidth()-(messField.getX()),gl_panel.getHeight());
+		messField.setBackground(new Color(0,0,0,100));
+		
+		selectOne =new JLabel("<---  select one");
+		selOn=true;
+		selectOne.setSize(200,40);
+		selectOne.setForeground(COMMON);
+		selectOne.setFont(new Font("Verdana",Font.ITALIC,24));
+		selectOne.setLocation(300,300);
+		
+		///
+			client.send("get friends");
+		///
+		add(messField,selectOne);
+		
+		addToGl_panel(messField);
+		addToGl_panel(delimiter);
+		addToGl_panel(friends_p);
+	}
+	public void renderFriends(String txt){
+		
+		ArrayList<String> friends = new ArrayList<>();
+		int i=0;
+		int k =0;
+		
+		for(int z = 0 ; z < txt.length();z++){
+			if(txt.charAt(z)==';'){
+				k=z;
+				if(!txt.substring(i, k).equals("")){
+					friends.add(txt.substring(i, k)+'/');
+				}
+				
+				i=k+1;
+			}
+		}
+		
+		 param = new ArrayList<>();
+		
+		
+		for(String s:friends){
+			i=0;
+			k=0;
+			for(int j = 0 ; j <s.length();j++){
+				if(s.charAt(j)=='/'){
+					k=j;
+					if(!s.substring(i, k).equals("")){
+						param.add(s.substring(i, k));
+					}
+					
+					i=k+1;
+				}
+			}
+			
+		}
+		upF=true;
+		updateFriends();
+		
+	}
+	public void updateFriendsOnline(String txt){
+		for(int i = 0 ; i < param.size();i++){
+			if(param.get(i).equals(txt)){
+				param.set(i+1, "online");
+			}
+		}
+		updateFriends();
+		
+	}
+	public void updateFriendsOffline(String txt){
+		for(int i = 0 ; i < param.size();i++){
+			if(param.get(i).equals(txt)){
+				param.set(i+1, "offline");
+			}
+		}
+		updateFriends();
+		
+	}
+	private void updateFriends(){
+		clearF_panel();
+		temp=0;
+		for(int z=0;z<param.size();z++ ){
+			
+			if(z%2==0){
+				if(!param.get(z).equals(client.login)){
+					String sub =param.get(z); 
+					JLabel label = new JLabel(sub);
+					label.setSize(100,40);
+					label.setLocation(20,temp*50);
+					label.setFont(new Font("Verdana",Font.ITALIC,15));
+					label.setForeground(COMMON);
+					label.addMouseListener(new MouseListener() {
+						
+						@Override
+						public void mouseReleased(MouseEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void mousePressed(MouseEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void mouseExited(MouseEvent e) {
+							// TODO Auto-generated method stub
+							label.setForeground(COMMON);
+						}
+						
+						@Override
+						public void mouseEntered(MouseEvent e) {
+							// TODO Auto-generated method stub
+							label.setForeground(Color.MAGENTA);
+						}
+						
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							// TODO Auto-generated method stub
+							connectionWith(label.getText());
+						}
+					});
+					addToF_panel(label);
+					String sub1 =param.get(z+1); 
+					JLabel label1 = new JLabel(sub1);
+					label1.setSize(100,20);
+					label1.setLocation(20,temp*50+20);
+					label1.setFont(new Font("Verdana",Font.ITALIC,9));
+					if(param.get(z+1).equals("online")){
+						label1.setForeground(Color.GREEN);
+					}else{
+						label1.setForeground(Color.RED);
+					}
+					
+					addToF_panel(label1);
+					temp++;
+				}
+			}
+		}
+	}
+	private void connectionWith(String login){
+		client.send("connect:"+client.login+"/"+login);
 	}
 }

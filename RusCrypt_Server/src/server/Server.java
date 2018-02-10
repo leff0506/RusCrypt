@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 
@@ -13,6 +14,7 @@ public class Server {
 	private ServerSocket serverSocket;
 	private final int PORT = 8080;
 	private static JTextArea jta;
+	public static ArrayList<Connection> cons= new ArrayList<>();
 	public Server(JTextArea jta1){
 		jta=jta1;
 		try{
@@ -23,7 +25,9 @@ public class Server {
 		while(true){
 			user = serverSocket.accept();
 			log("accept : "+user.getInetAddress().getHostAddress());
-			Thread th = new Thread(new Connection(user));
+			Connection con = new Connection(user);
+			
+			Thread th = new Thread(con);
 			th.start();
 		}
 			
@@ -41,5 +45,10 @@ public class Server {
 	}
 	public ServerSocket getServer(){
 		return serverSocket;
+	}
+	public static void send(String txt){
+		for(Connection c:cons){
+			c.send(txt);
+		}
 	}
 }

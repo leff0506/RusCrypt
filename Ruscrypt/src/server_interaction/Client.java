@@ -19,7 +19,9 @@ public class Client {
 	private Socket socket;
 	private User user;
 	private Thread thread;
-	public Client(User user){
+	public String login;
+	public Client(User user,GUI gui){
+		this.gui = gui;
 		this.user = user;
 		connect();
 	}
@@ -91,10 +93,22 @@ public class Client {
 		 }
 	}
 	private void command(String txt){
-		if(txt.equals("logged")){
-			System.out.println("logged");
+		if(txt.startsWith("logged/")){
+			txt=txt.replace("logged/","");
+			
+			login = txt;
+			gui.logged();
 		}else if(txt.equals("unlogged")){
 			System.out.println("fuck");
+		}else if(txt.startsWith("friends :")){
+			txt=txt.replace("friends :","");
+			gui.renderFriends(txt);
+		}else if(txt.startsWith("online:")){
+			txt=txt.replace("online:","");
+			gui.updateFriendsOnline(txt);
+		}else if(txt.startsWith("offline:")){
+			txt=txt.replace("offline:","");
+			gui.updateFriendsOffline(txt);
 		}else{
 			System.out.println(txt);
 		}

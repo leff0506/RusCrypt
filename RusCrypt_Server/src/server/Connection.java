@@ -17,10 +17,13 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
+import messanger.Messanger;
+
 public class Connection implements Runnable{
 	private BufferedReader in;
 	private final Socket user;
 	private PrintWriter out;
+	private String login="";
 	public Connection(Socket user){
 		this.user=user;
 
@@ -54,8 +57,25 @@ public class Connection implements Runnable{
 				
 				
 			} catch (IOException e) {
-				Server.log("error");
-				e.printStackTrace();
+				connect=false;
+				if(login.equals("")){
+					Server.log(user.getInetAddress().getHostAddress()+": exited ");
+				}else{
+					Server.log(login+": exited ");
+					Server.send("offline:"+login);
+					PrintStream printStream;
+					try {
+						printStream = new PrintStream(new FileOutputStream("data_base/info/"+login+".txt", false), false);
+						printStream.println("offline");
+						printStream.close();
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+				}
+				
+				
 				break;
 			}
 			
@@ -69,9 +89,17 @@ public class Connection implements Runnable{
 		}else if(txt.startsWith("registration:")){
 			txt=txt.replace("registration:","");
 			registration(txt);
+		}else if(txt.startsWith("get friends")){
+			sendFriends();
+			
+		}else if(txt.startsWith("connect:")){
+			txt=txt.replace("connect:","");
+			Messanger.getInstance().beginChat(txt);
+		}else{
+			Server.log(txt);
 		}
 	}
-	private void send(String txt){
+	public void send(String txt){
 		out.println(txt);
 		out.flush();
 	}
@@ -100,9 +128,22 @@ public class Connection implements Runnable{
 				}
 				
 				if(inStrCut.equals(txt)){
-					
-					send("logged");
+					String login="";
+					for(int i = 0 ; i < inStr.length();i++){
+						if(inStr.charAt(i)!='/'){
+							login+=inStr.charAt(i);
+						}else{
+							break;
+						}
+					}
+					this.login=login;
+					send("logged/"+login);
 					autho=true;
+					Server.cons.add(this);
+					PrintStream printStream = new PrintStream(new FileOutputStream("data_base/info/"+login+".txt", false), false);
+					printStream.println("online");
+					printStream.close();
+					Server.send("online:"+login);
 					break;
 				}
 				
@@ -132,7 +173,7 @@ public class Connection implements Runnable{
 					break;
 				}
 			}
-			Server.log("login "+login);
+			
 			boolean sign_up_error=false;
 			while((inStr = reader.readLine())!=null){
 				if(inStr.startsWith(login)){
@@ -147,6 +188,14 @@ public class Connection implements Runnable{
 				PrintStream printStream = new PrintStream(new FileOutputStream("data_base/autho.txt", true), true);
 				printStream.println(txt);
 				printStream.close();
+				File file = new File("data_base/friends/"+login+".txt");
+				file.createNewFile();
+				File file1 = new File("data_base/info/"+login+".txt");
+				file1.createNewFile();
+				PrintStream printStream1 = new PrintStream(new FileOutputStream(file1, false), false);
+				printStream1.println("offline");
+				printStream1.close();
+				
 			}
 			
 			
@@ -158,6 +207,32 @@ public class Connection implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	private void sendFriends(){
+		String out="";
+		File file = new File("data_base/info");
+		File[] people = file.listFiles();
+		int am = people.length;
+		
+		for(int i = 0 ; i < am;i++){
+			
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(people[i])));
+				out+=people[i].getName();
+				out=out.replaceAll(".txt","");
+				out+='/';
+				out+=reader.readLine();
+				reader.close();
+				out+=';';
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		send("friends :"+out);
 	}
 }
 
