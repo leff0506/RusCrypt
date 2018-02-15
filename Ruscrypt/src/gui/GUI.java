@@ -639,4 +639,163 @@ public class GUI {
 	private void connectionWith(String login){
 		client.send("connect:"+client.login+"/"+login);
 	}
+	public void requestForMess(String txt){
+		 JFrame ask = new JFrame();
+		 ask.setLocationRelativeTo(null);
+		 ask.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		 ask.setSize(300,300);
+		 ask.setResizable(false);
+		 
+		 
+		 JPanel panel = new JPanel();
+		 panel.setLayout(null);
+		 frame.setVisible(false);
+		 
+		 
+		 JLabel lab = new JLabel();
+		 lab.setSize(200,100);
+		 lab.setText(txt+" wants to start messeging");
+		 lab.setLocation(ask.getWidth()/2-lab.getWidth()/2,20);
+		 
+		 
+		 JLabel yes = new JLabel("Yes");
+		 yes.setSize(100,50);
+		 yes.setLocation(0,100);
+		 yes.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			 }
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				ask.dispose();
+				frame.setVisible(true);
+				client.send("request for mess is accepted:"+client.login+"/"+txt);
+			}
+		});
+		 
+		 JLabel no = new JLabel("No");
+		 no.setSize(100,50);
+		 no.setLocation(ask.getWidth()-no.getWidth(),100);
+		 no.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				ask.dispose();
+				frame.setVisible(true);
+				client.send("request for mess is denied:"+client.login+"/"+txt);
+			}
+		});
+		 panel.add(yes);
+		 panel.add(no);
+		 panel.add(lab);
+		 
+		 ask.add(panel);
+		ask.setVisible(true);		
+	}
+	public void requestForMessDenied(String txt){
+		JFrame natification = new JFrame();
+		natification.setLocationRelativeTo(null);
+		natification.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		natification.setSize(300,300);
+		natification.setResizable(false);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(null);
+		
+		frame.setVisible(false);
+		
+		JLabel lab = new JLabel(txt+" denied your request for chatting");
+		lab.setSize(100,50);
+		lab.setLocation(natification.getWidth()/2-lab.getWidth()/2,10);
+		
+		JLabel gotIt = new JLabel("Got it");
+		gotIt.setSize(100,50);
+		gotIt.setLocation(natification.getWidth()/2-gotIt.getWidth()/2,natification.getHeight()-gotIt.getHeight()-50);
+		gotIt.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				natification.dispose();
+				frame.setVisible(true);
+			}
+		});
+		
+		panel.add(lab);
+		panel.add(gotIt);
+		natification.add(panel);
+		natification.setVisible(true);
+	}
 }

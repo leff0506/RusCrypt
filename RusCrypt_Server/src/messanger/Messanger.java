@@ -1,5 +1,6 @@
 package messanger;
 
+import server.Connection;
 import server.Server;
 
 public class Messanger {
@@ -35,5 +36,41 @@ public class Messanger {
 			
 		}
 		Server.log("request for connection from #"+login1+"# to #"+login2+"#");
+		for(Connection c :Server.cons){
+			if(c.login.equals(login2)){
+				c.send("request for mess from :"+login1);
+				break;
+			}
+		}
+	}
+	public void requestForMessDenied(String logins){
+		String save = logins;
+		logins+='/';
+		String login1="";
+		String login2="";
+		
+		for(int i = 0 ; i < logins.length();i++){
+			if(logins.charAt(i)!='/'){
+				login1+=logins.charAt(i);
+			}else{
+				break;
+			}
+			
+		}
+		logins = logins.replace(login1+'/', "");
+		for(int i = 0 ; i < logins.length();i++){
+			if(logins.charAt(i)!='/'){
+				login2+=logins.charAt(i);
+			}else{
+				break;
+			}
+			
+		}
+		for(Connection c :Server.cons){
+			if(c.login.equals(login2)){
+				c.send("request for mess is denied:"+login1);
+				break;
+			}
+		}
 	}
 }

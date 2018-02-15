@@ -23,7 +23,7 @@ public class Connection implements Runnable{
 	private BufferedReader in;
 	private final Socket user;
 	private PrintWriter out;
-	private String login="";
+	public String login="";
 	public Connection(Socket user){
 		this.user=user;
 
@@ -95,6 +95,9 @@ public class Connection implements Runnable{
 		}else if(txt.startsWith("connect:")){
 			txt=txt.replace("connect:","");
 			Messanger.getInstance().beginChat(txt);
+		}else if(txt.startsWith("request for mess is denied:")){
+			txt=txt.replace("request for mess is denied:", "");
+			Messanger.getInstance().requestForMessDenied(txt);
 		}else{
 			Server.log(txt);
 		}
@@ -234,5 +237,6 @@ public class Connection implements Runnable{
 		}
 		send("friends :"+out);
 	}
+
 }
 

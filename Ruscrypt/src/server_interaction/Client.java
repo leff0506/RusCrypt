@@ -109,7 +109,17 @@ public class Client {
 		}else if(txt.startsWith("offline:")){
 			txt=txt.replace("offline:","");
 			gui.updateFriendsOffline(txt);
-		}else{
+			
+		}else if(txt.startsWith("request for mess from :")){
+			txt=txt.replaceAll("request for mess from :","");
+			gui.requestForMess(txt);
+		}else if(txt.startsWith("request for mess is denied:")){
+			txt=txt.replace("request for mess is denied:", "");
+			gui.requestForMessDenied(txt);
+		}
+		else{
+			
+		
 			System.out.println(txt);
 		}
 	}
