@@ -30,6 +30,8 @@ public class GUI {
 	private ArrayList<String> param =new ArrayList<>();
 	private boolean upF=false;
 	private boolean selOn = false;
+	public static boolean inChat = false;
+	public static String inChatWith=null;
 	
 	private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	private final Color COMMON = Color.WHITE;
@@ -65,8 +67,13 @@ public class GUI {
 			public void windowGainedFocus(WindowEvent e) {
 				// TODO Auto-generated method stub
 				if(upF){
-					clearF_panel();
-					updateFriends();
+					
+					if(inChatWith==null) {
+						updateFriends();
+					}else {
+						updateFriends(inChatWith);
+					}
+					
 				}
 				if(selOn){
 					
@@ -637,10 +644,15 @@ public class GUI {
 		}
 	}
 	private void connectionWith(String login){
-		client.send("connect:"+client.login+"/"+login);
+		if(!inChat) {
+			client.send("connect:"+client.login+"/"+login);
+			
+		}
+		
 	}
 	public void requestForMess(String txt){
 		 JFrame ask = new JFrame();
+		 ask.setAlwaysOnTop(true);
 		 ask.setLocationRelativeTo(null);
 		 ask.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		 ask.setSize(300,300);
@@ -693,6 +705,7 @@ public class GUI {
 				ask.dispose();
 				frame.setVisible(true);
 				client.send("request for mess is accepted:"+client.login+"/"+txt);
+				
 			}
 		});
 		 
@@ -742,6 +755,7 @@ public class GUI {
 	}
 	public void requestForMessDenied(String txt){
 		JFrame natification = new JFrame();
+		natification.setAlwaysOnTop(true);
 		natification.setLocationRelativeTo(null);
 		natification.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		natification.setSize(300,300);
@@ -753,7 +767,7 @@ public class GUI {
 		frame.setVisible(false);
 		
 		JLabel lab = new JLabel(txt+" denied your request for chatting");
-		lab.setSize(100,50);
+		lab.setSize(250,50);
 		lab.setLocation(natification.getWidth()/2-lab.getWidth()/2,10);
 		
 		JLabel gotIt = new JLabel("Got it");
@@ -797,5 +811,69 @@ public class GUI {
 		panel.add(gotIt);
 		natification.add(panel);
 		natification.setVisible(true);
+	}
+	public void updateFriends(String login) {
+		
+		clearF_panel();
+		temp=0;
+		for(int z=0;z<param.size();z++ ){
+			
+			if(z%2==0){
+				if(param.get(z).equals(login)){
+					String sub =param.get(z); 
+					JLabel label = new JLabel(sub);
+					label.setSize(100,40);
+					label.setLocation(20,temp*50);
+					label.setFont(new Font("Verdana",Font.ITALIC,15));
+					label.setForeground(COMMON);
+					label.addMouseListener(new MouseListener() {
+						
+						@Override
+						public void mouseReleased(MouseEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void mousePressed(MouseEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void mouseExited(MouseEvent e) {
+							// TODO Auto-generated method stub
+							label.setForeground(COMMON);
+						}
+						
+						@Override
+						public void mouseEntered(MouseEvent e) {
+							// TODO Auto-generated method stub
+							label.setForeground(Color.MAGENTA);
+						}
+						
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							// TODO Auto-generated method stub
+							connectionWith(label.getText());
+						}
+					});
+					addToF_panel(label);
+					String sub1 =param.get(z+1); 
+					JLabel label1 = new JLabel(sub1);
+					label1.setSize(100,20);
+					label1.setLocation(20,temp*50+20);
+					label1.setFont(new Font("Verdana",Font.ITALIC,9));
+					if(param.get(z+1).equals("online")){
+						label1.setForeground(Color.GREEN);
+					}else{
+						label1.setForeground(Color.RED);
+					}
+					
+					addToF_panel(label1);
+					temp++;
+				}
+			}
+		}
 	}
 }

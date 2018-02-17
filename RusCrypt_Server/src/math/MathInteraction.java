@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Interaction {
+public class MathInteraction {
 	private static ArrayList<Integer> primes = null;
+	private static int numOfPrime=0;
 	private static ArrayList<Integer> dataForAntiderivativeRoot = new ArrayList<>();
 	public static int antiderivativeRoot(int prime){
 		int res=0;
@@ -39,24 +40,24 @@ public class Interaction {
 		return true;
 	}
 	public static int getPrime(){
-		if(primes==null){
-			try {
-				primes = new ArrayList<>();
-				Scanner sc = new Scanner(new File("data_base/primes.txt"));
-				while(sc.hasNextLine()){
-					primes.add(sc.nextInt());
-				}
-				sc.close();
+		int res=0;
+		try {
+		
+			Scanner sc = new Scanner(new File("data_base/primes.txt"));
+			for(int i = 0 ; i < numOfPrime;i++) {
+				sc.nextInt();
+			}
+			res = sc.nextInt();
+			numOfPrime++;
+			sc.close();
 				
 					
-			} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			e.printStackTrace();
 		}
-		int i = (int)(Math.random()*primes.size());
-		int res = primes.get(i);
-		primes.remove(i);
+		
+		
 		return res;
 	}
 	/**

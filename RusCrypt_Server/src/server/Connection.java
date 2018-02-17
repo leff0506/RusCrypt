@@ -16,7 +16,11 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Iterator;
 
+import encrypt.Diff;
+import encrypt.DiffManager;
 import messanger.Messanger;
 
 public class Connection implements Runnable{
@@ -24,12 +28,13 @@ public class Connection implements Runnable{
 	private final Socket user;
 	private PrintWriter out;
 	public String login="";
+	private ArrayList<Connection> toRemove= new ArrayList<>();
 	public Connection(Socket user){
 		this.user=user;
 
 	}
 	@Override
-	public void run(){
+	synchronized public void run(){
 		try {
 			in = new BufferedReader(new InputStreamReader(user.getInputStream(),"utf-8"));
 			out = new PrintWriter(user.getOutputStream(),true);
@@ -61,6 +66,13 @@ public class Connection implements Runnable{
 				if(login.equals("")){
 					Server.log(user.getInetAddress().getHostAddress()+": exited ");
 				}else{
+					toRemove.clear();
+					for(Connection c :Server.cons) {
+						if(c.login.equals(login)) {
+							toRemove.add(c);
+						}
+					}
+					Server.cons.removeAll(toRemove);
 					Server.log(login+": exited ");
 					Server.send("offline:"+login);
 					PrintStream printStream;
@@ -82,29 +94,93 @@ public class Connection implements Runnable{
 		}
 		
 	}
-	public void serverCommand(String txt){
+	synchronized public void serverCommand(String txt){
 		if(txt.startsWith("authorization:")){
-			txt=txt.replace("authorization:","");
+			txt=txt.replaceFirst("authorization:","");
 			authorization(txt);
 		}else if(txt.startsWith("registration:")){
-			txt=txt.replace("registration:","");
+			txt=txt.replaceFirst("registration:","");
 			registration(txt);
 		}else if(txt.startsWith("get friends")){
 			sendFriends();
 			
 		}else if(txt.startsWith("connect:")){
-			txt=txt.replace("connect:","");
+			txt=txt.replaceFirst("connect:","");
 			Messanger.getInstance().beginChat(txt);
 		}else if(txt.startsWith("request for mess is denied:")){
-			txt=txt.replace("request for mess is denied:", "");
+			txt=txt.replaceFirst("request for mess is denied:", "");
 			Messanger.getInstance().requestForMessDenied(txt);
-		}else{
+		}else if(txt.startsWith("request for mess is accepted:")){
+			txt=txt.replaceFirst("request for mess is accepted:", "");
+			Messanger.getInstance().requestForMessAccepted(txt);
+		}else if(txt.startsWith("Diff B:")) {
+			txt=txt.replaceFirst("Diff B:", "");
+			Server.log("get Diff B : "+txt);
+			String idS="";
+			for(int i = 0 ; i < txt.length();i++) {
+				if(!(txt.charAt(i)=='/')) {
+					idS+=txt.charAt(i);
+				}else {
+					break;
+				}
+			}
+			txt=txt.replaceFirst(idS+"/","");
+			Server.log("Diff B (2): "+txt);
+			int id = Integer.parseInt(idS);
+			
+			String login="";
+			for(int i = 0 ; i < txt.length();i++) {
+				if(!(txt.charAt(i)=='/')) {
+					login+=txt.charAt(i);
+				}else {
+					break;
+				}
+			}
+			txt=txt.replaceFirst(login+"/","");
+			Server.log("Diff B(3) : "+txt);
+			for(DiffManager d:Messanger.diffs) {
+				if(d.getId()==id) {
+					d.B(login,Integer.parseInt(txt));
+					break;
+				}
+			}
+		}
+		else{
 			Server.log(txt);
 		}
 	}
 	public void send(String txt){
 		out.println(txt);
 		out.flush();
+	}
+	private static String delim(String logins,int num) {
+		String copy = logins;
+		copy+='/';
+		String login1="";
+		String login2="";
+		
+		for(int i = 0 ; i < copy.length();i++){
+			if(copy.charAt(i)!='/'){
+				login1+=copy.charAt(i);
+			}else{
+				break;
+			}
+			
+		}
+		copy = copy.replaceFirst(login1+'/', "");
+		for(int i = 0 ; i < copy.length();i++){
+			if(copy.charAt(i)!='/'){
+				login2+=copy.charAt(i);
+			}else{
+				break;
+			}
+			
+		}
+		if(num==1) {
+			return login1;
+		}else {
+			return login2;
+		}
 	}
 	private void authorization(String txt){
 		try {

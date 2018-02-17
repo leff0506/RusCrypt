@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import encrypt.Diff;
 import gui.GUI;
 import user.User;
 
@@ -18,6 +19,7 @@ public class Client {
 	private PrintWriter out;
 	private Socket socket;
 	private User user;
+	public Diff diff;
 	private Thread thread;
 	public String login;
 	public Client(User user,GUI gui){
@@ -94,28 +96,48 @@ public class Client {
 	}
 	private void command(String txt){
 		if(txt.startsWith("logged/")){
-			txt=txt.replace("logged/","");
+			txt=txt.replaceFirst("logged/","");
 			
 			login = txt;
 			gui.logged();
 		}else if(txt.equals("unlogged")){
 			System.out.println("fuck");
 		}else if(txt.startsWith("friends :")){
-			txt=txt.replace("friends :","");
+			txt=txt.replaceFirst("friends :","");
 			gui.renderFriends(txt);
 		}else if(txt.startsWith("online:")){
-			txt=txt.replace("online:","");
+			txt=txt.replaceFirst("online:","");
 			gui.updateFriendsOnline(txt);
 		}else if(txt.startsWith("offline:")){
-			txt=txt.replace("offline:","");
+			txt=txt.replaceFirst("offline:","");
 			gui.updateFriendsOffline(txt);
 			
 		}else if(txt.startsWith("request for mess from :")){
-			txt=txt.replaceAll("request for mess from :","");
+			txt=txt.replaceFirst("request for mess from :","");
 			gui.requestForMess(txt);
 		}else if(txt.startsWith("request for mess is denied:")){
-			txt=txt.replace("request for mess is denied:", "");
+			txt=txt.replaceFirst("request for mess is denied:", "");
 			gui.requestForMessDenied(txt);
+		}
+		else if(txt.startsWith("Diff:")){
+			txt=txt.replaceFirst("Diff:", "");
+			String login ="";
+			for(int i = 0 ; i < txt.length();i++) {
+				if(txt.charAt(i)!='/') {
+					login+=txt.charAt(i);
+				}else {
+					break;
+				}
+			}
+			gui.inChatWith=login;
+			gui.updateFriends(login);
+			txt=txt.replace(login+'/', "");
+			diff=new Diff(this,txt);
+		}else if(txt.startsWith("Diff B:")){
+			txt=txt.replaceFirst("Diff B:", "");
+			diff.generateKey(Integer.parseInt(txt));
+		}else if(txt.equals("get b")) {
+			diff.repeatSendB();
 		}
 		else{
 			
