@@ -19,6 +19,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import encrypt.Alph;
 import encrypt.Diff;
 import encrypt.DiffManager;
 import messanger.Messanger;
@@ -138,12 +139,15 @@ public class Connection implements Runnable{
 			}
 			txt=txt.replaceFirst(login+"/","");
 			Server.log("Diff B(3) : "+txt);
+			
 			for(DiffManager d:Messanger.diffs) {
 				if(d.getId()==id) {
 					d.B(login,Integer.parseInt(txt));
 					break;
 				}
 			}
+		}else if(txt.equals("get alph")){
+			send("alph :"+Alph.getAlph());
 		}
 		else{
 			Server.log(txt);

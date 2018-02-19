@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import encrypt.Diff;
+import encrypt.EncrDecr;
 import gui.GUI;
 import user.User;
 
@@ -19,7 +20,7 @@ public class Client {
 	private PrintWriter out;
 	private Socket socket;
 	private User user;
-	public Diff diff;
+	public Diff diff=null;
 	private Thread thread;
 	public String login;
 	public Client(User user,GUI gui){
@@ -132,12 +133,21 @@ public class Client {
 			gui.inChatWith=login;
 			gui.updateFriends(login);
 			txt=txt.replace(login+'/', "");
-			diff=new Diff(this,txt);
+			if(diff==null) {
+				diff=new Diff(this,txt);
+			}else {
+				diff.secondIt(txt);
+			}
+			
 		}else if(txt.startsWith("Diff B:")){
 			txt=txt.replaceFirst("Diff B:", "");
 			diff.generateKey(Integer.parseInt(txt));
 		}else if(txt.equals("get b")) {
 			diff.repeatSendB();
+		}else if(txt.startsWith("alph :")) {
+			txt=txt.replaceFirst("alph :", "");
+			diff.setAlph(txt);
+			
 		}
 		else{
 			

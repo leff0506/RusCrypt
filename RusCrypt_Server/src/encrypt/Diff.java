@@ -13,11 +13,11 @@ public class Diff {
 	private int prime;
 	private int antiderivativeRoot;
 	private int B1=-1;
-	
+	private DiffManager man;
 	
 	private String login1;
 	public Diff(String login) {
-		
+		this.man=man;
 		this.login1=login;
 		
 		
