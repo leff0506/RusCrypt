@@ -4,13 +4,17 @@ import java.util.ArrayList;
 
 import javax.swing.text.Position;
 
-
+import encrypt.MLine;
 import server_interaction.Client;
 
 public class EncrDecr {
-	private static int k1;//mult
-	private static int k2;//addit 
+	public static int k1;//mult
+	public static int k2;//addit 
 	private static String alph;
+	private static Client client;
+	public static void setClient(Client client) {
+		EncrDecr.client = client;
+	}
 	public static void setAlph(String alph1) {
 		alph = alph1;
 	}
@@ -30,10 +34,12 @@ public class EncrDecr {
 		String res ="";
 		int multiplicative = multiplicative(k1);
 		int additive = additive(k2);
+		System.out.println(alph.length());
+		System.out.println("mult "+multiplicative+"  add "+additive);
 		int temp;
 		for(int i = 0;i<input.length();i++) {
 			temp = posOfChar(input.charAt(i));
-			temp = (temp*multiplicative+additive)%alph.length();
+			temp = ((temp+additive)*multiplicative)%alph.length();
 			res+=charOfPos(temp);
 		}
 		
@@ -47,6 +53,7 @@ public class EncrDecr {
 		MLine line = new MLine();
 		boolean isFirst = true;
 		MLine last = null;
+		line.b=-1;
 		while(line.b!=0) {
 			line = new MLine();
 			if(isFirst) {
@@ -54,34 +61,52 @@ public class EncrDecr {
 				line.b=in;
 				line.d=GCD(line.a,line.b);
 				last =  line.clone();
-				data.add(line);
+				data.add(line.clone());
 				isFirst=false;
 			}else {
 				line.a=last.b;
 				line.b = (last.a%last.b);
 				line.d=GCD(line.a,line.b);
-				data.add(line);
+				data.add(line.clone());
 				last=line.clone();
 			}
 			
 		}
-		MLine change = data.get(data.size()-1);
-		change.u=0;
-		change.v=1;
+		MLine change;
+		
+			change = data.get(data.size()-1);
+			change.u=0;
+			change.v=1;
+		
+		
 		last = null;
 		
 		for(int i = data.size()-2;i>=0;i--) {
 			if(i == data.size()-2) {
 				data.get(i).u=change.v;
-				data.get(i).v= (data.get(i).d-(data.get(i).a*data.get(i).u))/data.get(i).b;
+			
+				data.get(i).setV((1-data.get(i).a*data.get(i).u)/data.get(i).b);
 			}else {
 				data.get(i).u=data.get(i+1).v;
-				data.get(i).v= (data.get(i).d-(data.get(i).a*data.get(i).u))/data.get(i).b;
+				
+				data.get(i).setV((1-(data.get(i).a*data.get(i).u))/data.get(i).b);
 				
 			}
+			
+			
 		}
 		
-		return (data.get(0).v>0)? data.get(0).v:data.get(0).v+alph.length();
+	
+		
+		if(data.get(0).v>0) {
+			return data.get(0).v;
+		}else {
+			int temp =data.get(0).v;
+			
+
+			return alph.length()+temp;
+		}
+		
 	}
 	private static int posOfChar(char a) {
 		for(int i = 0 ; i < alph.length();i++) {
@@ -107,7 +132,7 @@ public class EncrDecr {
 	}
 	public static void  setMultiplicative(int a) {
 		int save = a;
-		
+		save%=alph.length();
 		while(GCD(alph.length(),save)!=1) {
 			save++;
 		}
@@ -117,5 +142,8 @@ public class EncrDecr {
 		int save = a;
 		save%=alph.length();
 		k2=save;
+	}
+	public static void sendMess(String login,String txt) {
+		client.send("mess:"+login+'/'+client.login+'/'+encr(txt));
 	}
 }

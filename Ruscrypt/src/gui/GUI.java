@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
+import encrypt.EncrDecr;
 import server_interaction.Client;
 import user.User;
 
@@ -32,7 +35,7 @@ public class GUI {
 	private boolean selOn = false;
 	public static boolean inChat = false;
 	public static String inChatWith=null;
-	
+	private JTextField mess;
 	private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	private final Color COMMON = Color.WHITE;
 	private MyTF login_tf;
@@ -42,7 +45,7 @@ public class GUI {
 	private MyTF name_tf;
 	private MyTF surname_tf;
 	private int temp;
-	
+	public JTextArea jta;
 	
 	private Client client;
 	public GUI(User user){
@@ -874,6 +877,75 @@ public class GUI {
 					temp++;
 				}
 			}
+			addToGl_panel(friends_p);
 		}
+	}
+	public void chatting() {
+		cleanGL_panel();
+		EncrDecr.setClient(client);
+		updateFriends(inChatWith);
+		
+		 jta = new JTextArea();
+		
+		 jta.setLocation(friends_p.getWidth(), 0);
+		 jta.setSize(gl_panel.getWidth()-friends_p.getWidth(),440);
+		 
+		
+		jta.setText(" ");
+		jta.setText("");
+
+		JScrollPane scroll = new JScrollPane(jta);
+//		scroll.setLayout(null);
+		jta.setLineWrap(true);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setBounds(jta.getBounds());
+		
+		scroll.setWheelScrollingEnabled(true);
+		mess = new JTextField();
+		mess.setLocation(friends_p.getWidth(),jta.getHeight());
+		mess.setSize(gl_panel.getWidth()-friends_p.getWidth()-75,50);
+		
+		JLabel send = new JLabel("Send");
+		send.setLocation(mess.getWidth()+mess.getX(),jta.getHeight());
+		send.setSize(75,100);
+		send.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				EncrDecr.sendMess(inChatWith,mess.getText());
+				System.out.println("to "+inChatWith +" from " + client.login+" mess : "+mess.getText());
+				jta.setText(jta.getText()+"\nYou : "+mess.getText());
+				mess.setText("");
+			}
+		});
+		addToGl_panel(send);
+		addToGl_panel(mess);
+		addToGl_panel(scroll);
 	}
 }

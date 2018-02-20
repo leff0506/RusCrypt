@@ -134,7 +134,7 @@ public class Client {
 			gui.updateFriends(login);
 			txt=txt.replace(login+'/', "");
 			if(diff==null) {
-				diff=new Diff(this,txt);
+				diff=new Diff(this,txt,gui);
 			}else {
 				diff.secondIt(txt);
 			}
@@ -148,6 +148,9 @@ public class Client {
 			txt=txt.replaceFirst("alph :", "");
 			diff.setAlph(txt);
 			
+		}else if(txt.startsWith("mess:")) {
+			txt=txt.replaceFirst("mess:", "");
+			gui.jta.setText(gui.jta.getText()+'\n'+gui.inChatWith+" : "+EncrDecr.decr(txt));
 		}
 		else{
 			

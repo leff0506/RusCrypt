@@ -148,6 +148,34 @@ public class Connection implements Runnable{
 			}
 		}else if(txt.equals("get alph")){
 			send("alph :"+Alph.getAlph());
+		}else if(txt.startsWith("mess:")) {
+			txt=txt.replaceFirst("mess:", "");
+			String login="";
+			for(int i = 0 ; i < txt.length();i++) {
+				if(!(txt.charAt(i)=='/')) {
+					login+=txt.charAt(i);
+				}else {
+					break;
+				}
+			}
+			
+			txt=txt.replaceFirst(login+'/',"");
+			
+			String login2="";
+			for(int i = 0 ; i < txt.length();i++) {
+				if(!(txt.charAt(i)=='/')) {
+					login2+=txt.charAt(i);
+				}else {
+					break;
+				}
+			}
+			
+			txt=txt.replaceFirst(login2+'/',"");
+			for(Connection c : Server.cons) {
+				if(c.login.equals(login)) {
+					c.send("mess:"+txt);
+				}
+			}
 		}
 		else{
 			Server.log(txt);

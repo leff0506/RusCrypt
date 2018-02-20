@@ -16,10 +16,11 @@ public class Diff {
 	private DiffManager man;
 	
 	private String login1;
-	public Diff(String login) {
+	private String login2;
+	public Diff(String login,String login2) {
 		this.man=man;
 		this.login1=login;
-		
+		this.login2=login2;
 		
 
 		
@@ -45,7 +46,7 @@ public class Diff {
 	public void sendAll() {
 		for(Connection c : Server.cons) {
 			if(c.login.equals(login1)) {
-				c.send("Diff:"+login1+'/'+antiderivativeRoot+'/'+prime+'/'+id);
+				c.send("Diff:"+login2+'/'+antiderivativeRoot+'/'+prime+'/'+id);
 			}
 		}
 	}

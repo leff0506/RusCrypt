@@ -23,8 +23,8 @@ public class DiffManager {
 
 		id=Messanger.diffs.size();
 		
-		diff1=new Diff(login1);
-		diff2=new Diff(login2);
+		diff1=new Diff(login1,login2);
+		diff2=new Diff(login2,login1);
 		diff1.setId(id);
 		diff2.setId(id);
 		prime=MathInteraction.getPrime();
@@ -69,8 +69,8 @@ public class DiffManager {
 					e.printStackTrace();
 				}
 				
-				diff3 = new Diff(login1);
-				diff4= new Diff(login2);
+				diff3 = new Diff(login1,login2);
+				diff4= new Diff(login2,login1);
 				diff3.setId(id);
 				diff4.setId(id);
 				prime1=MathInteraction.getPrime();

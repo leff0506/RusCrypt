@@ -20,11 +20,12 @@ public class Diff {
 	private int K2=-1;
 	private int rand;
 	private int rand2;
+	private GUI gui;
 	private Client client;
 	private EncrDecr encrDecr;
-	public Diff(Client client,String data) {
+	public Diff(Client client,String data,GUI gui) {
 		id=Integer.parseInt(delim(data,3));
-		
+		this.gui=gui;
 		System.out.println("id Diff = "+id);
 		this.client= client;
 		GUI.inChat=true;
@@ -85,7 +86,9 @@ public class Diff {
 		encrDecr.setAlph(txt);
 		encrDecr.setMultiplicative(K1);
 		encrDecr.setAdditive(K2);
-		client.send("K1:"+K1+" K2:"+K2);
+		gui.chatting();
+		client.send("K1:"+encrDecr.k1+" K2:"+encrDecr.k2);
+		
 		
 	}
 	public void secondIt(String data) {
