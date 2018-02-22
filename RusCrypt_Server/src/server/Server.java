@@ -30,22 +30,7 @@ public class Server {
 			user = serverSocket.accept();
 			log("accept : "+user.getInetAddress().getHostAddress());
 			Connection con = new Connection(user);
-			Thread thh = null;
-			 thh = new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					while(true) {
-						try {
-							thh.sleep(500);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						Server.log(Integer.toString(cons.size()));					}
-					
-				}
-			});
+
 			//thh.start();
 			Thread th = new Thread(con);
 			th.start();

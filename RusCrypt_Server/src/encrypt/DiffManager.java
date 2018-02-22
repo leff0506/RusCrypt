@@ -1,7 +1,13 @@
 package encrypt;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+
 import math.MathInteraction;
 import messanger.Messanger;
+import server.Connection;
 import server.Server;
 
 public class DiffManager {
@@ -22,7 +28,55 @@ public class DiffManager {
 	public DiffManager(String login1,String login2) {
 
 		id=Messanger.diffs.size();
+		try {
+			PrintWriter out = new PrintWriter(new FileOutputStream(new File("data_base/info/"+login1+".txt")));
+			PrintWriter out1 = new PrintWriter(new FileOutputStream(new File("data_base/info/"+login2+".txt")));
+			out1.println("busy");
+			out.println("busy");
+			out.flush();
+			out1.flush();
+			
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		for(Connection c : Server.cons) {
+			if(c.login.equals(login1)) {
+				c.isBusy=true;
+			
+			}
 		
+		}
+		for(Connection c : Server.cons) {
+			if(c.login.equals(login2)) {
+				c.isBusy=true;
+				
+			}
+		
+		}
+		for(Connection c : Server.cons) {
+			if(!c.login.equals(login1)&&c.login.equals(login2)) {
+				
+				
+				c.send("busy:"+login1);
+				c.send("busy:"+login2);
+			}
+		
+		}
+		for(Connection c : Server.cons) {
+			if(c.login.equals(login1)) {
+				
+				c.send("busy:"+login2);
+			}
+		
+		}
+		for(Connection c : Server.cons) {
+			if(c.login.equals(login2)) {
+				
+				c.send("busy:"+login1);
+			}
+		
+		}
 		diff1=new Diff(login1,login2);
 		diff2=new Diff(login2,login1);
 		diff1.setId(id);

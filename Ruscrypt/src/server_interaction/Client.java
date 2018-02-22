@@ -62,7 +62,7 @@ public class Client {
 							// TODO Auto-generated catch block
 							connection = false;
 							
-							e.printStackTrace();
+							gui.serverError();
 						}
 						catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -102,15 +102,29 @@ public class Client {
 			login = txt;
 			gui.logged();
 		}else if(txt.equals("unlogged")){
-			System.out.println("fuck");
-		}else if(txt.startsWith("friends :")){
+			gui.unlogged();
+		}else if(txt.equals("sign_up_error")){
+			gui.signUpError();
+		}
+		else if(txt.startsWith("friends :")){
 			txt=txt.replaceFirst("friends :","");
 			gui.renderFriends(txt);
 		}else if(txt.startsWith("online:")){
 			txt=txt.replaceFirst("online:","");
 			gui.updateFriendsOnline(txt);
+		}
+		else if(txt.startsWith("stop chat")){
+			gui.stopChat();
+		}
+		else if(txt.startsWith("update friends")){
+			
+			gui.updateFriends();
+		}else if(txt.startsWith("busy:")){
+			txt=txt.replaceFirst("busy:","");
+			gui.updateFriendsBusy(txt);
 		}else if(txt.startsWith("offline:")){
 			txt=txt.replaceFirst("offline:","");
+			
 			gui.updateFriendsOffline(txt);
 			
 		}else if(txt.startsWith("request for mess from :")){

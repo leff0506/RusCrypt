@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -29,6 +30,7 @@ public class Connection implements Runnable{
 	private final Socket user;
 	private PrintWriter out;
 	public String login="";
+	public boolean isBusy;
 	private ArrayList<Connection> toRemove= new ArrayList<>();
 	public Connection(Socket user){
 		this.user=user;
@@ -38,7 +40,7 @@ public class Connection implements Runnable{
 	synchronized public void run(){
 		try {
 			in = new BufferedReader(new InputStreamReader(user.getInputStream(),"utf-8"));
-			out = new PrintWriter(user.getOutputStream(),true);
+			out = new PrintWriter(new OutputStreamWriter(user.getOutputStream()),true);
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -102,6 +104,20 @@ public class Connection implements Runnable{
 		}else if(txt.startsWith("registration:")){
 			txt=txt.replaceFirst("registration:","");
 			registration(txt);
+		}else if(txt.startsWith("exitchat")){
+			txt=txt.replaceFirst("exitchat/","");
+			String login1="";
+			for(int i = 0 ; i < txt.length();i++) {
+				if(!(txt.charAt(i)=='/')) {
+					login1+=txt.charAt(i);
+				}else {
+					break;
+				}
+			}
+			txt=txt.replaceFirst(login1+'/',"");
+			setOnline(login1);
+			setOnline(txt);
+			stopChat(login1);
 		}else if(txt.startsWith("get friends")){
 			sendFriends();
 			
@@ -248,6 +264,12 @@ public class Connection implements Runnable{
 						}
 					}
 					this.login=login;
+					BufferedReader reader1 = new BufferedReader(new InputStreamReader(new FileInputStream("data_base/info/"+login+".txt")));
+					String inf = reader1.readLine();
+					if(!inf.equals("offline")) {
+						send("unlogged");
+						return;
+					}
 					send("logged/"+login);
 					autho=true;
 					Server.cons.add(this);
@@ -345,6 +367,42 @@ public class Connection implements Runnable{
 		}
 		send("friends :"+out);
 	}
+	public void setBusy(String login) {
+		PrintStream printStream1;
+		try {
+			printStream1 = new PrintStream(new FileOutputStream("data_base/info/"+login+".txt", false), false);
+			printStream1.println("busy");
+			printStream1.close();
+			sendFriends();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	public void setOnline(String login) {
+		PrintStream printStream1;
+		try {
+			printStream1 = new PrintStream(new FileOutputStream("data_base/info/"+login+".txt", false), false);
+			printStream1.println("online");
+			
+			printStream1.close();
+			sendFriends();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	public void stopChat(String txt) {
+		for(Connection c : Server.cons) {
+			if(c.login.equals(txt)) {
+				c.send("stop chat");
+			}
+		}
+	}
+	
+	
 
 }
 
