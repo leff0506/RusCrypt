@@ -55,7 +55,7 @@ public class GUI {
 	private Cursor buttonC= new Cursor(Cursor.HAND_CURSOR);
 	private ImagePanel autho;
 	private 	JPanel upper;
-	private boolean toRendUpper=false;//to render upper label with login
+	public boolean toRendUpper=false;//to render upper label with login
 	
 	private Client client;
 	public GUI(User user){

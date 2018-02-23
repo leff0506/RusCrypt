@@ -61,7 +61,9 @@ public class Client {
 						} catch (java.net.SocketException e) {
 							// TODO Auto-generated catch block
 							connection = false;
-							
+							gui.inChat=false;
+							gui.inChatWith=null;
+							gui.toRendUpper=false;
 							gui.serverError();
 						}
 						catch (IOException e) {

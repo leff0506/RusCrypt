@@ -87,7 +87,7 @@ public class Diff {
 		encrDecr.setMultiplicative(K1);
 		encrDecr.setAdditive(K2);
 		gui.chatting();
-		client.send("K1:"+encrDecr.k1+" K2:"+encrDecr.k2);
+		
 		
 		
 	}
